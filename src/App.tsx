@@ -9,7 +9,7 @@ const { Search } = Input;
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   function onSearch(value: string) {
-    window.location.href = "/s?" + value;
+    window.location.href = "/search?" + value;
     console.log(value);
   }
   return (
