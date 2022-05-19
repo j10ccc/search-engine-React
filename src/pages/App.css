@@ -1,0 +1,14 @@
+@media screen and (max-width: 600px) {
+  .search-area {
+    width: 80vw;
+  }
+}
+@media screen and (min-width: 600px) {
+  .search-area {
+    width: 700px;
+  }
+}
+.search-area {
+  padding-top: 20vh;
+  margin: 0 auto;
+}

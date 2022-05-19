@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "ahooks": "^3.3.12",
     "antd": "^4.20.5",
     "axios": "^0.27.2",
     "react": "^18.0.0",

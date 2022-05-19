@@ -4,7 +4,7 @@ import RichText from "./RichText";
 function RETitle(props: any) {
   const { title, url } = props;
   const style = {
-    fontSize: "20px"
+    fontSize: "1.4rem"
   };
   return (
     <a href={url} style={style}>
@@ -47,13 +47,9 @@ function REURL(props: any) {
 export default function ResultItem(props: any) {
   const { item } = props;
   return (
-    <Card
-      title={<REURL url={item.URL} />}
-      bordered={false}
-      size="small"
-      style={{ width: 600 }}
-      key={item.ID}>
+    <Card bordered={false} size="small" key={item.ID} style={{ maxWidth: 600 }}>
       <Space direction="vertical">
+        <REURL url={item.URL} />
         <RETitle title={item.Title} url={item.URL} />
         <RichText plainText={item.Content} />
       </Space>

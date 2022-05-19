@@ -1,0 +1,15 @@
+@media screen and (min-width: 600px) {
+  .align-content {
+    margin-left: 180px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .align-content {
+    margin-left: 2vw;
+  }
+}
+
+.result-info {
+  margin-top: 20px;
+}

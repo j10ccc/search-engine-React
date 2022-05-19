@@ -1,22 +1,20 @@
 import { Layout, Input } from "antd";
 import React, { useState } from "react";
-import SEFooter from "./components/SEFooter";
-import SEHeader from "./components/SEHeader";
-
+import SEFooter from "../components/SEFooter";
+import "./App.css";
 const { Content } = Layout;
 const { Search } = Input;
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   function onSearch(value: string) {
-    window.location.href = "/search?" + value;
+    window.location.href = "/search?word=" + value;
     console.log(value);
   }
   return (
     <Layout style={{ height: "100vh" }}>
-      <SEHeader darkMode={darkMode} setDarkMode={setDarkMode} />
       <Content>
-        <div style={{ width: "700px", paddingTop: "20vh", margin: "0 auto" }}>
+        <div className="search-area">
           <h1>图片</h1>
           <Search
             allowClear

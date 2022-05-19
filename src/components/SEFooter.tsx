@@ -1,12 +1,14 @@
-import { Space, Layout } from "antd";
-const { Footer } = Layout;
+import { Button, Space } from "antd";
 
 export default function SEFooter() {
+  const style = {
+    padding: "1vw"
+  };
   return (
-    <Footer>
+    <div style={style}>
       <Space>
-        <span>关于牛马</span>
+        <Button type="text">关于牛马</Button>
       </Space>
-    </Footer>
+    </div>
   );
 }
