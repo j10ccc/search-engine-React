@@ -2,6 +2,9 @@
   .align-content {
     margin-left: 180px;
   }
+  .loading {
+    max-width: 600px;
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -10,6 +13,14 @@
   }
 }
 
+.pagination {
+  margin-top: 20px;
+}
+
 .result-info {
   margin-top: 20px;
+}
+
+.loading {
+  padding: 0 2vw;
 }

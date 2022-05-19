@@ -1,26 +1,33 @@
-import { Col, Layout, Row, Input, Space } from "antd";
-import { useEffect, useRef, useState } from "react";
-import SESwitch from "../SESwitch";
-import { useSize } from "ahooks";
+import { Input, Space } from "antd";
+// import SESwitch from "../SESwitch";
 import "./index.css";
-const { Header } = Layout;
 const { Search } = Input;
 
 export default function SEHeader(props: any) {
-  const { darkMode, setDarkMode } = props;
-  const [keyWord, setKeyWord] = useState("");
+  // const { darkMode, setDarkMode } = props;
 
-  const ref = useRef(null);
-  const size = useSize(ref);
+  function onSearch(value: string) {
+    window.location.href = "/search?word=" + value;
+    console.log(value);
+  }
   return (
     <header>
-      <div className="header-wrapper">
+      <Space
+        className="header-wrapper"
+        style={{ display: "flex", justifyContent: "space-between" }}>
         <Space>
-          <span>🐮🐴</span>
-          <Search />
-          <SESwitch darkMode={darkMode} setDarkMode={setDarkMode} />
+          <a href="/">🐮🐴</a>
+          <Search
+            size="large"
+            enterButton="牛马一下"
+            className="search-bar"
+            defaultValue={decodeURI(window.location.href.split("word=")[1])}
+            onSearch={onSearch}
+          />
         </Space>
-      </div>
+        {/*        <SESwitch darkMode={darkMode} setDarkMode={setDarkMode} />
+         */}
+      </Space>
     </header>
   );
 }

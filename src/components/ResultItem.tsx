@@ -26,7 +26,7 @@ function REURL(props: any) {
       s += " > " + item;
     });
   return (
-    <a href={url}>
+    <a href={url} style={{ fontFamily: "monospace" }}>
       {(baseURL + s).length > 50 ? (
         <>
           <span style={{ color: "black" }}>{baseURL}</span>
