@@ -1,4 +1,4 @@
-import { Alert, Divider, Input, Layout, Pagination, Space, Spin } from "antd";
+import { Alert, Divider, Layout, Pagination, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { getSearchResultAPI } from "../../api/search";
 import ResultItem from "../../components/ResultItem";
@@ -14,7 +14,7 @@ export type ResultItemType = {
   Content: string;
 };
 
-export default function Result(props: any) {
+export default function SearchResult(props: any) {
   const keyWord = location.href.split("?word=")[1];
   const [resultList, setResultList] = useState<ResultItemType[]>();
   const [page, setPage] = useState(1);

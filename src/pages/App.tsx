@@ -1,4 +1,5 @@
 import { Layout, Input } from "antd";
+import { Link } from "react-router-dom";
 import SEFooter from "../components/SEFooter";
 import "./App.css";
 const { Content } = Layout;
@@ -15,7 +16,11 @@ export default function App() {
       <Content>
         <div className="search-area">
           <h1>图片</h1>
-          <Search enterButton="牛马一下" size="large" onSearch={onSearch} />
+          <Search
+            enterButton={<Link to="/search">牛马一下</Link>}
+            size="large"
+            onSearch={onSearch}
+          />
         </div>
       </Content>
       <SEFooter />
