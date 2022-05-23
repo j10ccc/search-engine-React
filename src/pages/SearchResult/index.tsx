@@ -15,7 +15,7 @@ export type ResultItemType = {
 };
 
 export default function SearchResult(props: any) {
-  const keyWord = location.href.split("?word=")[1];
+  const keyWord = decodeURI(location.href.split("?word=")[1]);
   const [resultList, setResultList] = useState<ResultItemType[]>();
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
@@ -23,12 +23,34 @@ export default function SearchResult(props: any) {
   const [loading, setLoading] = useState(false);
   if (keyWord === "") window.location.href = "/";
 
+  function initialResultList(data: ResultItemType[]) {
+    setResultList(
+      data.map((item: ResultItemType) => {
+        const pos = item.Content.indexOf(keyWord);
+        const reg = /[^A-Za-z0-9\u4e00-\u9fa5+]/g;
+        let i = pos;
+        for (i = pos; i > 0; i--) {
+          if (reg.test(item.Content[i])) break;
+        }
+        const content = item.Content.slice(
+          i + 1,
+          i + 100 <= item.Content.length ? pos + 100 : item.Content.length
+        );
+        return {
+          ID: item.ID,
+          Title: item.Title,
+          URL: item.URL,
+          Content: content.replace(/\s*/g, "")
+        };
+      })
+    );
+  }
   let isRequested = false;
   useEffect(() => {
     if (!isRequested) {
       setLoading(true);
       getSearchResultAPI({ word: keyWord, paperNum: 1 }).then((res) => {
-        setResultList(res.data.data.Data);
+        initialResultList(res.data.data.Data);
         setTotal(res.data.data.Length);
         setLoading(false);
       });
@@ -41,7 +63,7 @@ export default function SearchResult(props: any) {
     setPage(page);
     setLoading(true);
     await getSearchResultAPI({ word: keyWord, paperNum: page }).then((res) => {
-      setResultList(res.data.data.Data);
+      initialResultList(res.data.data.Data);
       setTotal(res.data.data.Length);
     });
     setLoading(false);
@@ -56,12 +78,10 @@ export default function SearchResult(props: any) {
           style={{ overflowY: "scroll", backgroundColor: "white" }}>
           <div className="align-content result-info">共找到 {total} 条结果</div>
           <div className="align-content">
-            <Space direction="vertical">
-              {resultList
-                ?.slice((page - 1) * 10, page * 10)
-                ?.map((item, index) => (
-                  <ResultItem item={item} key={index} />
-                ))}
+            <Space direction="vertical" size="small">
+              {resultList?.slice(0, page * 10)?.map((item, index) => (
+                <ResultItem item={item} key={index} />
+              ))}
             </Space>
           </div>
           <Pagination
@@ -71,6 +91,7 @@ export default function SearchResult(props: any) {
             className="pagination"
             defaultCurrent={1}
             total={total}
+            showSizeChanger={false}
             onChange={changePage}
           />
           <Divider />

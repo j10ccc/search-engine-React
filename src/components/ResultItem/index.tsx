@@ -1,17 +1,22 @@
-import { Card, Space } from "antd";
-import RichText from "./RichText";
+import { Card, Space, Typography } from "antd";
+import RichText from "../RichText";
+import "./index.css";
 
+const { Paragraph, Text } = Typography;
 function RETitle(props: any) {
   const { title, url } = props;
   const style = {
     fontSize: "1.4rem"
   };
   return (
-    <a href={url} style={style}>
-      {title}
-    </a>
+    <Text ellipsis>
+      <a href={url} style={style}>
+        <RichText plainText={title} />
+      </a>
+    </Text>
   );
 }
+
 function REURL(props: any) {
   const { url } = props;
   const pattern: RegExp = /^(http:\/\/|https:\/\/)[^/]+\//;
@@ -26,21 +31,14 @@ function REURL(props: any) {
       s += " > " + item;
     });
   return (
-    <a href={url} style={{ fontFamily: "monospace" }}>
-      {(baseURL + s).length > 50 ? (
-        <>
-          <span style={{ color: "black" }}>{baseURL}</span>
-          <span style={{ color: "gray" }}>
-            {s.slice(0, 51 - baseURL.length)}...
-          </span>
-        </>
-      ) : (
+    <Text ellipsis style={{ width: "400px" }}>
+      <a href={url} style={{ fontFamily: "monospace" }}>
         <>
           <span style={{ color: "black" }}>{baseURL}</span>
           <span style={{ color: "gray" }}>{s}</span>
         </>
-      )}
-    </a>
+      </a>
+    </Text>
   );
 }
 
@@ -48,10 +46,12 @@ export default function ResultItem(props: any) {
   const { item } = props;
   return (
     <Card bordered={false} size="small" key={item.ID} style={{ maxWidth: 600 }}>
-      <Space direction="vertical">
+      <Space direction="vertical" className="result-wrapper">
         <REURL url={item.URL} />
         <RETitle title={item.Title} url={item.URL} />
-        <RichText plainText={item.Content} />
+        <Paragraph ellipsis={{ rows: 2 }}>
+          <RichText plainText={item.Content} />
+        </Paragraph>
       </Space>
     </Card>
   );
