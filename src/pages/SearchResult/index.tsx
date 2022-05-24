@@ -1,5 +1,16 @@
-import { Alert, Divider, Layout, Pagination, Space, Spin } from "antd";
+import {
+  Alert,
+  Button,
+  Card,
+  Divider,
+  Layout,
+  Pagination,
+  Space,
+  Spin
+} from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { getRelatedAPI } from "../../api/related";
 import { getSearchResultAPI } from "../../api/search";
 import ResultItem from "../../components/ResultItem";
 import SEFooter from "../../components/SEFooter";
@@ -21,8 +32,13 @@ export default function SearchResult(props: any) {
   const [total, setTotal] = useState(1);
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [relatedList, setRelatedList] = useState<string[]>();
+
   if (keyWord === "") window.location.href = "/";
 
+  function searchRelated(relatedWord: string) {
+    window.location.href = "/search?word=" + relatedWord;
+  }
   function initialResultList(data: ResultItemType[]) {
     setResultList(
       data.map((item: ResultItemType) => {
@@ -54,6 +70,9 @@ export default function SearchResult(props: any) {
         setTotal(res.data.data.Length);
         setLoading(false);
       });
+      getRelatedAPI(keyWord).then((res) => {
+        if (res.data.data != null) setRelatedList(res.data.data);
+      });
     }
     isRequested = true;
   }, []);
@@ -77,18 +96,37 @@ export default function SearchResult(props: any) {
           className="result-content"
           style={{ overflowY: "scroll", backgroundColor: "white" }}>
           <div className="align-content result-info">共找到 {total} 条结果</div>
-          <div className="align-content">
-            <Space direction="vertical" size="small">
-              {resultList?.slice(0, page * 10)?.map((item, index) => (
-                <ResultItem item={item} key={index} />
-              ))}
-            </Space>
-          </div>
+          <Space direction="vertical" size="small" className="align-content">
+            {resultList?.slice(0, page * 10)?.map((item, index) => (
+              <ResultItem item={item} key={index} />
+            ))}
+          </Space>
+          {relatedList ? (
+            <Card
+              title="相关搜索"
+              bordered
+              size="small"
+              className="related-wrapper align-content">
+              <Space wrap>
+                {relatedList?.map((item, index) => {
+                  return (
+                    <Button
+                      shape="round"
+                      icon={<SearchOutlined />}
+                      key={index}
+                      onClick={() => searchRelated(item)}>
+                      {item}
+                    </Button>
+                  );
+                })}
+              </Space>
+            </Card>
+          ) : null}
           <Pagination
             current={page}
             hideOnSinglePage
             pageSize={10}
-            className="pagination"
+            className="pagination align-content"
             defaultCurrent={1}
             total={total}
             showSizeChanger={false}

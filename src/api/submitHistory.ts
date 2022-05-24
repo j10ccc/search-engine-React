@@ -1,8 +1,8 @@
 import { myAxios } from "./axios";
 
-export function getSearchResultAPI(paramsList: any) {
+export function postHistoryAPI(paramsList: any) {
   return myAxios({
-    url: "/api/search",
+    url: "/api/submitHistory",
     method: "post",
     data: paramsList
   });

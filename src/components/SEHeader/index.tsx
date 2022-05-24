@@ -1,14 +1,19 @@
 import { Input, Space } from "antd";
+import { postHistoryAPI } from "../../api/submitHistory";
 // import SESwitch from "../SESwitch";
 import "./index.css";
 const { Search } = Input;
 
 export default function SEHeader(props: any) {
   // const { darkMode, setDarkMode } = props;
+  const keyWord = decodeURI(location.href.split("?word=")[1]);
 
   function onSearch(value: string) {
-    window.location.href = "/search?word=" + value;
-    console.log(value);
+    postHistoryAPI({ preWord: keyWord, word: value }).then((res) => {
+      if (res.data.msg === "SUCCESS")
+        window.location.href = "/search?word=" + value;
+    });
+    console.log(keyWord, value);
   }
   return (
     <header>

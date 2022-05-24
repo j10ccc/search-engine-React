@@ -5,11 +5,17 @@
   .loading {
     max-width: 600px;
   }
+  .related-wrapper {
+    max-width: 600px;
+  }
 }
 
 @media screen and (max-width: 600px) {
   .align-content {
     margin-left: 2vw;
+  }
+  .related-wrapper {
+    max-width: 90vw;
   }
 }
 
