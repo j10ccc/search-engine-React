@@ -2,10 +2,7 @@
   .align-content {
     margin-left: 180px;
   }
-  .loading {
-    max-width: 600px;
-  }
-  .related-wrapper {
+  .fit-width {
     max-width: 600px;
   }
 }
@@ -14,7 +11,7 @@
   .align-content {
     margin-left: 2vw;
   }
-  .related-wrapper {
+  .fit-width {
     max-width: 90vw;
   }
 }
@@ -29,4 +26,8 @@
 
 .loading {
   padding: 0 2vw;
+}
+
+.filter {
+  display: block;
 }

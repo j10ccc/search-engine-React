@@ -7,9 +7,9 @@ const { Search } = Input;
 
 export default function App() {
   // const [darkMode, setDarkMode] = useState(true);
+  sessionStorage.clear();
   function onSearch(value: string) {
     window.location.href = "/search?word=" + value;
-    console.log(value);
   }
   return (
     <Layout style={{ height: "100vh" }}>

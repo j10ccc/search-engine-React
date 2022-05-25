@@ -13,7 +13,6 @@ export default function SEHeader(props: any) {
       if (res.data.msg === "SUCCESS")
         window.location.href = "/search?word=" + value;
     });
-    console.log(keyWord, value);
   }
   return (
     <header>
@@ -22,13 +21,15 @@ export default function SEHeader(props: any) {
         style={{ display: "flex", justifyContent: "space-between" }}>
         <Space>
           <a href="/">🐮🐴</a>
-          <Search
-            size="large"
-            enterButton="牛马一下"
-            className="search-bar"
-            defaultValue={decodeURI(window.location.href.split("word=")[1])}
-            onSearch={onSearch}
-          />
+          <Space>
+            <Search
+              size="large"
+              enterButton="牛马一下"
+              className="search-bar"
+              defaultValue={decodeURI(window.location.href.split("word=")[1])}
+              onSearch={onSearch}
+            />
+          </Space>
         </Space>
         {/*        <SESwitch darkMode={darkMode} setDarkMode={setDarkMode} />
          */}

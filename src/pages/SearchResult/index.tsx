@@ -5,6 +5,7 @@ import {
   Divider,
   Layout,
   Pagination,
+  Select,
   Space,
   Spin
 } from "antd";
@@ -16,6 +17,7 @@ import ResultItem from "../../components/ResultItem";
 import SEFooter from "../../components/SEFooter";
 import SEHeader from "../../components/SEHeader";
 import "./index.css";
+import { useSessionStorageState } from "ahooks";
 const { Content } = Layout;
 
 export type ResultItemType = {
@@ -33,12 +35,17 @@ export default function SearchResult(props: any) {
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [relatedList, setRelatedList] = useState<string[]>();
-
+  const [filterList, setFilterList] =
+    useSessionStorageState<string[]>("nmse-filter-list");
   if (keyWord === "") window.location.href = "/";
 
   function searchRelated(relatedWord: string) {
     window.location.href = "/search?word=" + relatedWord;
   }
+  function handleFilterChange(content: string[]) {
+    setFilterList(content);
+  }
+
   function initialResultList(data: ResultItemType[]) {
     setResultList(
       data.map((item: ResultItemType) => {
@@ -65,11 +72,19 @@ export default function SearchResult(props: any) {
   useEffect(() => {
     if (!isRequested) {
       setLoading(true);
-      getSearchResultAPI({ word: keyWord, paperNum: 1 }).then((res) => {
-        initialResultList(res.data.data.Data);
-        setTotal(res.data.data.Length);
-        setLoading(false);
-      });
+      getSearchResultAPI({
+        word: keyWord + filterList?.map((item) => "-" + item).join(""),
+        paperNum: 1
+      })
+        .then((res) => {
+          initialResultList(res.data.data.Data);
+          setTotal(res.data.data.Length);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
       getRelatedAPI(keyWord).then((res) => {
         if (res.data.data != null) setRelatedList(res.data.data);
       });
@@ -81,7 +96,10 @@ export default function SearchResult(props: any) {
     document.querySelector(".result-content")?.scrollTo(0, 0);
     setPage(page);
     setLoading(true);
-    await getSearchResultAPI({ word: keyWord, paperNum: page }).then((res) => {
+    await getSearchResultAPI({
+      word: keyWord + filterList?.map((item) => "-" + item).join(""),
+      paperNum: page
+    }).then((res) => {
       initialResultList(res.data.data.Data);
       setTotal(res.data.data.Length);
     });
@@ -95,48 +113,60 @@ export default function SearchResult(props: any) {
         <Content
           className="result-content"
           style={{ overflowY: "scroll", backgroundColor: "white" }}>
-          <div className="align-content result-info">共找到 {total} 条结果</div>
-          <Space direction="vertical" size="small" className="align-content">
-            {resultList?.slice(0, page * 10)?.map((item, index) => (
-              <ResultItem item={item} key={index} />
-            ))}
+          <Space direction="vertical" size="small">
+            <div className="align-content result-info">
+              共找到 {total} 条结果
+            </div>
+            <Select
+              open={false}
+              className="align-content fit-width filter"
+              mode="tags"
+              defaultValue={filterList}
+              placeholder="请输入过滤词"
+              onChange={handleFilterChange}
+            />
+            <Space direction="vertical" size="small" className="align-content">
+              {resultList?.slice(0, page * 10)?.map((item, index) => (
+                <ResultItem item={item} key={index} />
+              ))}
+            </Space>
+            {relatedList ? (
+              <Card
+                title="相关搜索"
+                bordered
+                size="small"
+                className="fit-width align-content">
+                <Space wrap>
+                  {relatedList?.map((item, index) => {
+                    return (
+                      <Button
+                        shape="round"
+                        icon={<SearchOutlined />}
+                        key={index}
+                        onClick={() => searchRelated(item)}>
+                        {item}
+                      </Button>
+                    );
+                  })}
+                </Space>
+              </Card>
+            ) : null}
+            <Pagination
+              current={page}
+              hideOnSinglePage
+              pageSize={10}
+              className="pagination align-content"
+              defaultCurrent={1}
+              total={total}
+              showSizeChanger={false}
+              onChange={changePage}
+            />
           </Space>
-          {relatedList ? (
-            <Card
-              title="相关搜索"
-              bordered
-              size="small"
-              className="related-wrapper align-content">
-              <Space wrap>
-                {relatedList?.map((item, index) => {
-                  return (
-                    <Button
-                      shape="round"
-                      icon={<SearchOutlined />}
-                      key={index}
-                      onClick={() => searchRelated(item)}>
-                      {item}
-                    </Button>
-                  );
-                })}
-              </Space>
-            </Card>
-          ) : null}
-          <Pagination
-            current={page}
-            hideOnSinglePage
-            pageSize={10}
-            className="pagination align-content"
-            defaultCurrent={1}
-            total={total}
-            showSizeChanger={false}
-            onChange={changePage}
-          />
           <Divider />
           <SEFooter />
         </Content>
       ) : (
-        <div className="align-content loading">
+        <div className="align-content loading fit-width">
           <Spin tip="Loading">
             <Alert message="加载中" description="后台正在全速运算中" />
           </Spin>
