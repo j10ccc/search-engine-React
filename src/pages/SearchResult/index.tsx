@@ -1,15 +1,4 @@
-import {
-  Alert,
-  Button,
-  Card,
-  Divider,
-  Layout,
-  Pagination,
-  Select,
-  Space,
-  Spin
-} from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Divider, Layout, Pagination, Select, Space } from "antd";
 import { useEffect, useState } from "react";
 import { getRelatedAPI } from "../../api/related";
 import { getSearchResultAPI } from "../../api/search";
@@ -18,15 +7,24 @@ import SEFooter from "../../components/SEFooter";
 import SEHeader from "../../components/SEHeader";
 import "./index.css";
 import { useSessionStorageState } from "ahooks";
+import RelatedList from "../../components/RelatedList";
+import SELoading from "../../components/SELoading";
+import SESider from "../../components/SESider";
+import { getCollectionAPI } from "../../api/getCollection";
 const { Content } = Layout;
 
 export type ResultItemType = {
-  ID: number;
-  Title: string;
-  URL: string;
-  Content: string;
+  id: number;
+  title: string;
+  url: string;
+  content: string;
 };
-
+export type CollectionItem = {
+  id: number;
+  url: string;
+  title: string;
+  mark?: boolean;
+};
 export default function SearchResult(props: any) {
   const keyWord = decodeURI(location.href.split("?word=")[1]);
   const [resultList, setResultList] = useState<ResultItemType[]>();
@@ -37,11 +35,11 @@ export default function SearchResult(props: any) {
   const [relatedList, setRelatedList] = useState<string[]>();
   const [filterList, setFilterList] =
     useSessionStorageState<string[]>("nmse-filter-list");
+  const [uid, setUid] = useState(1);
+  const [collectionList, setCollectionList] = useState<CollectionItem[]>();
+
   if (keyWord === "") window.location.href = "/";
 
-  function searchRelated(relatedWord: string) {
-    window.location.href = "/search?word=" + relatedWord;
-  }
   function handleFilterChange(content: string[]) {
     setFilterList(content);
   }
@@ -49,21 +47,21 @@ export default function SearchResult(props: any) {
   function initialResultList(data: ResultItemType[]) {
     setResultList(
       data.map((item: ResultItemType) => {
-        const pos = item.Content.indexOf(keyWord);
+        const pos = item.content.indexOf(keyWord);
         const reg = /[^A-Za-z0-9\u4e00-\u9fa5+]/g;
         let i = pos;
         for (i = pos; i > 0; i--) {
-          if (reg.test(item.Content[i])) break;
+          if (reg.test(item.content[i])) break;
         }
-        const content = item.Content.slice(
+        const content = item.content.slice(
           i + 1,
-          i + 100 <= item.Content.length ? pos + 100 : item.Content.length
+          i + 100 <= item.content.length ? pos + 100 : item.content.length
         );
         return {
-          ID: item.ID,
-          Title: item.Title,
-          URL: item.URL,
-          Content: content.replace(/\s*/g, "")
+          id: item.id,
+          title: item.title,
+          url: item.url,
+          content: content.replace(/\s*/g, "")
         };
       })
     );
@@ -72,12 +70,25 @@ export default function SearchResult(props: any) {
   useEffect(() => {
     if (!isRequested) {
       setLoading(true);
+      let content = keyWord;
+      if (filterList !== undefined) {
+        content += filterList?.map((item) => "-" + item).join("");
+      }
       getSearchResultAPI({
-        word: keyWord + filterList?.map((item) => "-" + item).join(""),
+        word: content,
         paperNum: 1
       })
         .then((res) => {
-          initialResultList(res.data.data.Data);
+          initialResultList(
+            res.data.data.Data.map((item: any) => {
+              return {
+                id: item.ID,
+                title: item.Title,
+                url: item.URL,
+                content: item.Content
+              };
+            })
+          );
           setTotal(res.data.data.Length);
           setLoading(false);
         })
@@ -87,6 +98,17 @@ export default function SearchResult(props: any) {
         });
       getRelatedAPI(keyWord).then((res) => {
         if (res.data.data != null) setRelatedList(res.data.data);
+      });
+      getCollectionAPI(uid).then((res) => {
+        console.log(res.data.data);
+        setCollectionList(
+          res.data.data.data.map((item: any) => ({
+            id: item.id,
+            url: item.url,
+            title: item.title,
+            mark: true
+          }))
+        );
       });
     }
     isRequested = true;
@@ -100,7 +122,16 @@ export default function SearchResult(props: any) {
       word: keyWord + filterList?.map((item) => "-" + item).join(""),
       paperNum: page
     }).then((res) => {
-      initialResultList(res.data.data.Data);
+      initialResultList(
+        res.data.data.Data.map((item: any) => {
+          return {
+            id: item.ID,
+            title: item.Title,
+            url: item.URL,
+            content: item.Content
+          };
+        })
+      );
       setTotal(res.data.data.Length);
     });
     setLoading(false);
@@ -127,30 +158,17 @@ export default function SearchResult(props: any) {
             />
             <Space direction="vertical" size="small" className="align-content">
               {resultList?.slice(0, page * 10)?.map((item, index) => (
-                <ResultItem item={item} key={index} />
+                <ResultItem
+                  item={item}
+                  key={index}
+                  index={index}
+                  uid={uid}
+                  collectionList={collectionList}
+                  setCollectionList={setCollectionList}
+                />
               ))}
             </Space>
-            {relatedList ? (
-              <Card
-                title="相关搜索"
-                bordered
-                size="small"
-                className="fit-width align-content">
-                <Space wrap>
-                  {relatedList?.map((item, index) => {
-                    return (
-                      <Button
-                        shape="round"
-                        icon={<SearchOutlined />}
-                        key={index}
-                        onClick={() => searchRelated(item)}>
-                        {item}
-                      </Button>
-                    );
-                  })}
-                </Space>
-              </Card>
-            ) : null}
+            {relatedList ? <RelatedList relatedList={relatedList} /> : null}
             <Pagination
               current={page}
               hideOnSinglePage
@@ -166,12 +184,13 @@ export default function SearchResult(props: any) {
           <SEFooter />
         </Content>
       ) : (
-        <div className="align-content loading fit-width">
-          <Spin tip="Loading">
-            <Alert message="加载中" description="后台正在全速运算中" />
-          </Spin>
-        </div>
+        <SELoading />
       )}
+      <SESider
+        uid={uid}
+        collectionList={collectionList}
+        setCollectionList={setCollectionList}
+      />
     </Layout>
   );
 }
