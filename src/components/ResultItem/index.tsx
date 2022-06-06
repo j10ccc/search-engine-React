@@ -35,7 +35,6 @@ function REURL(props: any) {
       s += " > " + item;
     });
   function onChange(value: number) {
-    console.log(value);
     if (value === 1) {
       postCollectionAPI({ id, url, title, uid });
       setCollectionList((state: CollectionItem[]) => {

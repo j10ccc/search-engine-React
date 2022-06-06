@@ -1,19 +1,25 @@
 import { Input, Space } from "antd";
-import { postHistoryAPI } from "../../api/submitHistory";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 // import SESwitch from "../SESwitch";
 import "./index.css";
 const { Search } = Input;
 
 export default function SEHeader(props: any) {
   // const { darkMode, setDarkMode } = props;
-  const keyWord = decodeURI(location.href.split("?word=")[1]);
+  const [searchParams] = useSearchParams();
+  const [keyWord, setKeyWord] = useState(searchParams.get("word") || "");
 
-  function onSearch(value: string) {
-    postHistoryAPI({ preWord: keyWord, word: value }).then((res) => {
-      if (res.data.msg === "SUCCESS")
-        window.location.href = "/search?word=" + value;
-    });
+  useEffect(() => {
+    console.log(searchParams);
+  }, [searchParams]);
+  function onChangeKeyWord(e: any) {
+    // setSearchParmars(e.target.value);
+    // TODO: 动态搜索
+    setKeyWord(e.target.value);
+    console.log(keyWord);
   }
+
   return (
     <header>
       <Space
@@ -24,10 +30,11 @@ export default function SEHeader(props: any) {
           <Space>
             <Search
               size="large"
-              enterButton="牛马一下"
+              enterButton={<Link to={`/search?word=${keyWord}`}>牛马一下</Link>}
               className="search-bar"
-              defaultValue={decodeURI(window.location.href.split("word=")[1])}
-              onSearch={onSearch}
+              defaultValue={keyWord}
+              onChange={onChangeKeyWord}
+              // onSearch={onSearch}
             />
           </Space>
         </Space>

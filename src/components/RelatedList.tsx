@@ -1,11 +1,14 @@
 import { Button, Card, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 export default function RelatedList(props: any) {
   const { relatedList } = props;
+  const navigate = useNavigate();
 
-  function searchRelated(relatedWord: string) {
-    window.location.href = "/search?word=" + relatedWord;
+  function onClick(content: string) {
+    // navigate("/search?word=" + content, { replace: true });
+    navigate("/");
   }
   return (
     <Card
@@ -20,7 +23,7 @@ export default function RelatedList(props: any) {
               shape="round"
               icon={<SearchOutlined />}
               key={index}
-              onClick={() => searchRelated(item)}>
+              onClick={() => onClick(item)}>
               {item}
             </Button>
           );
