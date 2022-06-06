@@ -1,16 +1,14 @@
-import { Divider, Layout, Menu, Pagination, Select, Space } from "antd";
-import { useEffect, useState } from "react";
-import { getRelatedAPI } from "../../api/related";
-import { getSearchResultAPI } from "../../api/search";
+import { Divider, Layout, Menu } from "antd";
+import { useEffect, useRef, useState } from "react";
 import SEFooter from "../../components/SEFooter";
 import SEHeader from "../../components/SEHeader";
 import "./index.css";
-import { useSessionStorageState } from "ahooks";
+import { useInViewport, useSessionStorageState } from "ahooks";
 import SELoading from "../../components/SELoading";
 import SESider from "../../components/SESider";
 // import { getCollectionAPI } from "../../api/getCollection";
 import { Link, Route, Routes, useSearchParams } from "react-router-dom";
-import ImageResult from "../../routes/ImageResult";
+import ImageResult, { resetImagePage } from "../../routes/ImageResult";
 import TextResult from "../../routes/TextResult";
 const { Content } = Layout;
 
@@ -27,21 +25,27 @@ export type CollectionItem = {
   mark?: boolean;
 };
 export default function SearchResult(props: any) {
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(1);
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [filterList, setFilterList] =
     useSessionStorageState<string[]>("nmse-filter-list");
   const [uid, setUid] = useState(1);
   const [collectionList, setCollectionList] = useState<CollectionItem[]>();
+  const [searchMode, setSearchMode] = useState("text");
 
   const [searchParams] = useSearchParams();
-  const keyWord = searchParams.get("word") || "";
+  const [keyWord, setKeyWord] = useState(searchParams.get("word") || "");
+
+  const [updateImage, setUpdateImage] = useState(false);
+  const ref = useRef(null);
+  const [inViewport] = useInViewport(ref);
 
   function handleFilterChange(content: string[]) {
     setFilterList(content);
   }
+  useEffect(() => {
+    setUpdateImage(true);
+  }, [inViewport]);
 
   let isRequested = false;
   useEffect(() => {
@@ -64,7 +68,13 @@ export default function SearchResult(props: any) {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <SEHeader darkMode={darkMode} setDarkMode={setDarkMode} />
+      <SEHeader
+        keyWord={keyWord}
+        setKeyWord={setKeyWord}
+        searchMode={searchMode}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       {!loading ? (
         <Content
@@ -72,10 +82,14 @@ export default function SearchResult(props: any) {
           style={{ overflowY: "scroll", backgroundColor: "white" }}>
           <Menu
             mode="horizontal"
-            defaultSelectedKeys={["text"]}
+            selectedKeys={[searchMode]}
+            onSelect={({ key }) => {
+              setSearchMode(key);
+              resetImagePage();
+            }}
             className="align-content">
             <Menu.Item key="text">
-              <Link to={"/search?word=" + keyWord}>文本</Link>
+              <Link to={`/search?word=${keyWord}`}>文本</Link>
             </Menu.Item>
             <Menu.Item key="image">
               <Link to={`image?word=${keyWord}`}>图片</Link>
@@ -85,14 +99,30 @@ export default function SearchResult(props: any) {
           <Routes>
             <Route
               index
-              element={<TextResult filterList={filterList} />}></Route>
+              element={
+                <TextResult
+                  filterList={filterList}
+                  keyWord={keyWord}
+                  setKeyWord={setKeyWord}
+                  setLoading={setLoading}
+                />
+              }></Route>
             <Route
               path="image"
-              element={<ImageResult filterList={filterList} />}></Route>
+              element={
+                <ImageResult
+                  filterList={filterList}
+                  keyWord={keyWord}
+                  setKeyWord={setKeyWord}
+                  updateImage={updateImage}
+                  setUpdateImage={setUpdateImage}
+                  setLoading={setLoading}
+                />
+              }></Route>
           </Routes>
 
           <Divider />
-          <SEFooter />
+          <SEFooter ref={ref} />
         </Content>
       ) : (
         <SELoading />

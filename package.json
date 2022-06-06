@@ -11,6 +11,7 @@
     "ahooks": "^3.4.0",
     "antd": "^4.20.5",
     "axios": "^0.27.2",
+    "rc-virtual-list": "^3.4.8",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0"

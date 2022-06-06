@@ -6,14 +6,14 @@ import "./index.css";
 
 const { Paragraph, Text } = Typography;
 function RETitle(props: any) {
-  const { title, url } = props;
+  const { title, url, keyWord } = props;
   const style = {
     fontSize: "1.4rem"
   };
   return (
     <Text ellipsis>
       <a href={url} style={style}>
-        <RichText plainText={title} />
+        <RichText plainText={title} keyWord={keyWord} />
       </a>
     </Text>
   );
@@ -73,7 +73,7 @@ function REURL(props: any) {
 }
 
 export default function ResultItem(props: any) {
-  const { index, collectionList, setCollectionList, uid } = props;
+  const { index, collectionList, setCollectionList, uid, keyWord } = props;
   const item: ResultItemType = props.item;
   return (
     <Card bordered={false} size="small" key={item.id} style={{ maxWidth: 600 }}>
@@ -85,9 +85,9 @@ export default function ResultItem(props: any) {
           setCollectionList={setCollectionList}
           uid={uid}
         />
-        <RETitle title={item.title} url={item.url} />
+        <RETitle title={item.title} url={item.url} keyWord={keyWord} />
         <Paragraph ellipsis={{ rows: 2 }}>
-          <RichText plainText={item.content} />
+          <RichText plainText={item.content} keyWord={keyWord} />
         </Paragraph>
       </Space>
     </Card>

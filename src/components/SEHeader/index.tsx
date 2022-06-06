@@ -1,23 +1,30 @@
 import { Input, Space } from "antd";
-import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { postHistoryAPI } from "../../api/submitHistory";
 // import SESwitch from "../SESwitch";
 import "./index.css";
 const { Search } = Input;
 
 export default function SEHeader(props: any) {
   // const { darkMode, setDarkMode } = props;
-  const [searchParams] = useSearchParams();
-  const [keyWord, setKeyWord] = useState(searchParams.get("word") || "");
+  const { searchMode, keyWord, setKeyWord } = props;
+  const [tmp, setTmp] = useState(keyWord);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(searchParams);
-  }, [searchParams]);
+    setTmp(keyWord);
+  }, [keyWord]);
+
   function onChangeKeyWord(e: any) {
+    setTmp(e.target.value);
     // setSearchParmars(e.target.value);
     // TODO: 动态搜索
-    setKeyWord(e.target.value);
-    console.log(keyWord);
+  }
+  function onSearch() {
+    setKeyWord(tmp);
+    navigate(`/search${searchMode === "text" ? "" : "/image"}?word=${tmp}`);
+    if (keyWord !== tmp) postHistoryAPI({ preWord: keyWord, word: tmp });
   }
 
   return (
@@ -30,11 +37,12 @@ export default function SEHeader(props: any) {
           <Space>
             <Search
               size="large"
-              enterButton={<Link to={`/search?word=${keyWord}`}>牛马一下</Link>}
+              // enterButton={}
               className="search-bar"
               defaultValue={keyWord}
+              value={tmp}
               onChange={onChangeKeyWord}
-              // onSearch={onSearch}
+              onSearch={onSearch}
             />
           </Space>
         </Space>

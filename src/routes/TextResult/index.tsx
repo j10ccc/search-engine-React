@@ -26,14 +26,14 @@ export default function TextResult(props: any) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
   const [resultList, setResultList] = useState<ResultItemType[]>();
-  const [relatedList, setRelatedList] = useState<string[]>();
+  const [relatedList, setRelatedList] = useState<string[]>([]);
   const [filterList, setFilterList] =
     useSessionStorageState<string[]>("nmse-filter-list");
   const [uid, setUid] = useState(1);
   const [collectionList, setCollectionList] = useState<CollectionItem[]>();
   const [searchParams] = useSearchParams();
-
-  const { keyWord } = props;
+  const { keyWord, setKeyWord } = props;
+  const [loading, setLoading] = useState(true);
 
   function initialResultList(data: ResultItemType[]) {
     setResultList(
@@ -70,13 +70,16 @@ export default function TextResult(props: any) {
     }
     // 请求搜索结果
     // searchResult(content, 1);
-
+    searchRelated(keyWord);
     // TODO: 相关搜索先请求
     // 请求相关搜索
+  }, []);
+  async function searchRelated(content: string) {
     getRelatedAPI(keyWord).then((res) => {
       if (res.data.data != null) setRelatedList(res.data.data);
+      else setRelatedList([]);
     });
-  }, []);
+  }
 
   async function searchResult(content: string, paperNum: number) {
     getSearchResultAPI({
@@ -99,6 +102,7 @@ export default function TextResult(props: any) {
       .catch((err: ExceptionStatusType) => {
         console.log(err);
       });
+    searchRelated(keyWord);
   }
 
   function handleFilterChange(content: string[]) {
@@ -131,10 +135,19 @@ export default function TextResult(props: any) {
               uid={uid}
               collectionList={collectionList}
               setCollectionList={setCollectionList}
+              keyWord={keyWord}
             />
           ))}
         </Space>
-        {relatedList ? <RelatedList relatedList={relatedList} /> : null}
+        {relatedList.length !== 0 ? (
+          <RelatedList
+            className="align-content fit-width"
+            keyWord={keyWord}
+            setKeyWord={setKeyWord}
+            relatedList={relatedList}
+            type="text"
+          />
+        ) : null}
         <Pagination
           current={page}
           hideOnSinglePage
