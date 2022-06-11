@@ -34,7 +34,6 @@ export default function SESider(props: any) {
   useEffect(() => {
     if (onlineState) {
       getCollectionAPI().then((res) => {
-        console.log(res.data.data);
         setCollectionList(
           res.data.data.data.map((item: any) => ({
             id: item.RawID,

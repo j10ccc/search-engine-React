@@ -27,7 +27,8 @@ export type CollectionItem = {
 
 function useLoginHook() {
   const [onlineState, setOnlineState] = useState(false);
-  const [userName, setUserName] = useSessionStorageState("nmse-user-info");
+  const [userName, setUserName] =
+    useSessionStorageState<string>("nmse-user-info");
   const [collectionList, setCollectionList] = useState<CollectionItem[]>();
   return {
     onlineState,
@@ -53,10 +54,9 @@ export default function SearchResult(prtops: any) {
   const [updateImage, setUpdateImage] = useState(false);
 
   useEffect(() => {
-    if (window.location.href.indexOf("image")) setSearchMode("image");
-    setSearchMode("text");
+    if (window.location.href.indexOf("image") !== -1) setSearchMode("image");
+    else setSearchMode("text");
     // setLoading(true);
-    // TODO: ???
   }, []);
 
   return (

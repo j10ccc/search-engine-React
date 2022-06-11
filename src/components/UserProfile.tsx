@@ -8,7 +8,6 @@ import {
   UserOutlined
 } from "@ant-design/icons";
 import { loginAPI, registerAPI } from "../api/login";
-import { useCookieState } from "ahooks";
 import { LoginInfo } from "../pages/SearchResult";
 const { Meta } = Card;
 
@@ -114,7 +113,6 @@ export default function UserProfile(props: any) {
         <Form
           form={form}
           name="normal_login"
-          className="login-form"
           initialValues={{ remember: true }}
           onFinish={formType === "登录" ? login : register}>
           <Form.Item

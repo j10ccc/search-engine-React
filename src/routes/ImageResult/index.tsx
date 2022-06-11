@@ -3,9 +3,9 @@ import { List, Image, Card, Space, Select, Typography } from "antd";
 import { Content } from "antd/lib/layout/layout";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getRelatedAPI } from "../../api/related";
 import { getSearchImageResultAPI } from "../../api/searchImg";
-import RelatedList from "../../components/RelatedList";
+// import { getRelatedAPI } from "../../api/related";
+// import RelatedList from "../../components/RelatedList";
 import RichText from "../../components/RichText";
 const { Text } = Typography;
 
@@ -21,31 +21,33 @@ export function resetImagePage() {
 }
 export default function ImageResult(props: any) {
   const [resultList, setResultList] = useState<ImageResultItem[]>([]);
-  const [relatedList, setRelatedList] = useState<string[]>();
+  // const [relatedList, setRelatedList] = useState<string[]>();
   const [total, setTotal] = useState(0);
   const [searchParams] = useSearchParams();
   const { keyWord, updateImage, setUpdateImage } = props;
   const [filterList, setFilterList] =
     useSessionStorageState<string[]>("nmse-filter-list");
 
-  useEffect(() => {
+  /*   useEffect(() => {
     getRelatedAPI(keyWord).then((res) => {
       if (res.data.data != null) setRelatedList(res.data.data);
     });
   }, []);
+ */
 
   useEffect(() => {
     if (updateImage === true && resultList.length < total) {
-      searchImageResult(keyWord);
+      searchImageResult(getCombineContent(keyWord));
       setUpdateImage(false);
     }
   }, [updateImage]);
 
   useEffect(() => {
-    searchImageResult(searchParams.get("word") || "");
+    if (searchParams.get("word") && searchParams.get("word")?.length !== 0)
+      searchImageResult(getCombineContent(searchParams.get("word") || ""));
   }, [searchParams]);
 
-  function searchImageResult(content: string) {
+  async function searchImageResult(content: string) {
     getSearchImageResultAPI({ word: content, paperNum: ++imagePage }).then(
       (res: any) => {
         if (res.data.data.Data != null)
@@ -65,6 +67,14 @@ export default function ImageResult(props: any) {
       }
     );
   }
+  function getCombineContent(keyword: string) {
+    let content = keyWord;
+    if (filterList !== undefined) {
+      content += filterList?.map((item) => "-" + item).join("");
+    }
+    return content;
+  }
+
   function handleFilterChange(content: string[]) {
     setFilterList(content);
   }

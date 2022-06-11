@@ -1,11 +1,6 @@
 import { Card, Col, Rate, Row, Space, Typography } from "antd";
-import { useEffect } from "react";
 import { postCollectionAPI } from "../../api/postCollection";
-import {
-  CollectionItem,
-  LoginInfo,
-  ResultItemType
-} from "../../pages/SearchResult";
+import { LoginInfo, ResultItemType } from "../../pages/SearchResult";
 import RichText from "../RichText";
 import "./index.css";
 
@@ -43,7 +38,6 @@ function REURL(props: any) {
   function onChange(value: number) {
     // 添加收藏
     if (value === 1) {
-      console.log("hello");
       postCollectionAPI({ id, url, title });
       setCollectionList((state: any) => {
         return [...state, { id, url, title, mark: true }];
@@ -71,10 +65,9 @@ function REURL(props: any) {
           <Rate
             count={1}
             value={
-              collectionList?.filter((Item, Index) => {
-                console.log("fuck");
-                return Item.id === item.id && Item.mark;
-              }).length
+              collectionList?.filter(
+                (Item, Index) => Item.id === item.id && Item.mark
+              ).length
                 ? 1
                 : 0
             }

@@ -8,6 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { getRelatedAPI } from "../../api/related";
 import { ExceptionStatusType } from "antd/lib/result";
 import { getSearchResultAPI } from "../../api/search";
+import SELoading from "../../components/SELoading";
 const { Content } = Layout;
 
 export type ResultItemType = {
@@ -102,6 +103,7 @@ export default function TextResult(props: any) {
           })
         );
         setTotal(res.data.data.Length);
+        setLoading(false);
       })
       .catch((err: ExceptionStatusType) => {
         console.log(err);
@@ -114,52 +116,56 @@ export default function TextResult(props: any) {
   }
   function changePage(page: number) {
     document.querySelector(".result-content")?.scrollTo(0, 0);
-    searchResult(keyWord, page);
+    searchResult(getCombineContent(keyWord), page);
+    setLoading(true);
     setPage(page);
   }
-
-  return (
-    <Content className="result-content" style={{ backgroundColor: "white" }}>
-      <Space direction="vertical" size="small">
-        <div className="align-content result-info">共找到 {total} 条结果</div>
-        <Select
-          open={false}
-          className="align-content fit-width filter"
-          mode="tags"
-          defaultValue={filterList}
-          placeholder="请输入过滤词"
-          onChange={handleFilterChange}
-        />
-        <Space direction="vertical" size="small" className="align-content">
-          {resultList?.slice(0, page * MAX_ITEM_NUMBER)?.map((item, index) => (
-            <ResultItem
-              item={item}
-              key={index}
-              index={index}
-              keyWord={keyWord}
-            />
-          ))}
-        </Space>
-        {relatedList.length !== 0 ? (
-          <RelatedList
-            className="align-content fit-width"
-            keyWord={keyWord}
-            setKeyWord={setKeyWord}
-            relatedList={relatedList}
-            type="text"
+  if (loading) return <SELoading />;
+  else
+    return (
+      <Content className="result-content" style={{ backgroundColor: "white" }}>
+        <Space direction="vertical" size="small">
+          <div className="align-content result-info">共找到 {total} 条结果</div>
+          <Select
+            open={false}
+            className="align-content fit-width filter"
+            mode="tags"
+            defaultValue={filterList}
+            placeholder="请输入过滤词"
+            onChange={handleFilterChange}
           />
-        ) : null}
-        <Pagination
-          current={page}
-          hideOnSinglePage
-          pageSize={MAX_ITEM_NUMBER}
-          className="pagination align-content"
-          defaultCurrent={1}
-          total={total}
-          showSizeChanger={false}
-          onChange={changePage}
-        />
-      </Space>
-    </Content>
-  );
+          <Space direction="vertical" size="small" className="align-content">
+            {resultList
+              ?.slice(0, page * MAX_ITEM_NUMBER)
+              ?.map((item, index) => (
+                <ResultItem
+                  item={item}
+                  key={index}
+                  index={index}
+                  keyWord={keyWord}
+                />
+              ))}
+          </Space>
+          {relatedList.length !== 0 ? (
+            <RelatedList
+              className="align-content fit-width"
+              keyWord={keyWord}
+              setKeyWord={setKeyWord}
+              relatedList={relatedList}
+              type="text"
+            />
+          ) : null}
+          <Pagination
+            current={page}
+            hideOnSinglePage
+            pageSize={MAX_ITEM_NUMBER}
+            className="pagination align-content"
+            defaultCurrent={1}
+            total={total}
+            showSizeChanger={false}
+            onChange={changePage}
+          />
+        </Space>
+      </Content>
+    );
 }

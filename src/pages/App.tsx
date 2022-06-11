@@ -19,7 +19,7 @@ export default function App() {
     <Layout style={{ height: "100vh" }}>
       <Content>
         <div className="search-area">
-          <h1>图片</h1>
+          <img src="https://s1.ax1x.com/2022/06/13/XRfoWV.png"></img>
           <Search
             enterButton={<Link to={"/search?word=" + keyWord}>牛马一下</Link>}
             size="large"
