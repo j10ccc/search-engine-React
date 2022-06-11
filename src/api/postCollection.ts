@@ -4,6 +4,7 @@ export function postCollectionAPI(paramsList: any) {
   return myAxios({
     url: "/api/submitCollection",
     method: "post",
-    data: paramsList
+    data: paramsList,
+    withCredentials: true
   });
 }

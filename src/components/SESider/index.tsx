@@ -1,23 +1,65 @@
-import { Affix, Button, Drawer, List, Rate, Space, Typography } from "antd";
+import {
+  Affix,
+  Button,
+  Drawer,
+  Empty,
+  List,
+  Rate,
+  Space,
+  Typography
+} from "antd";
 import { BarsOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
-import { CollectionItem } from "../../pages/SearchResult";
+import { LoginInfo } from "../../pages/SearchResult";
 import { deleteCollectionAPI } from "../../api/deleteCollection";
+import UserProfile from "../UserProfile";
+import { getCollectionAPI } from "../../api/getCollection";
 const { Text } = Typography;
 
 export default function SESider(props: any) {
-  const { setCollectionList, uid } = props;
-  const collectionList: CollectionItem[] = props.collectionList;
   const [drawerVisible, setDrawerVisible] = useState(false);
+
+  const {
+    onlineState,
+    setOnlineState,
+    collectionList,
+    setCollectionList,
+    userName
+  } = LoginInfo.useContainer();
+
+  useEffect(() => {
+    if (userName) setOnlineState(true);
+  }, []);
+  useEffect(() => {
+    if (onlineState) {
+      getCollectionAPI().then((res) => {
+        console.log(res.data.data);
+        setCollectionList(
+          res.data.data.data.map((item: any) => ({
+            id: item.RawID,
+            url: item.URL,
+            title: item.Title,
+            mark: true
+          }))
+        );
+      });
+    } else {
+      setCollectionList([]);
+    }
+  }, [onlineState]);
 
   function onClose() {
     setDrawerVisible(false);
-    deleteCollectionAPI({
-      uid,
-      id: collectionList.filter((item) => !item.mark).map((item) => item.id)
-    });
-
+    if (collectionList) {
+      const toDelete = collectionList
+        .filter((item) => !item.mark)
+        .map((item) => item.id);
+      if (toDelete.length !== 0)
+        deleteCollectionAPI({
+          id: toDelete
+        });
+    }
     setCollectionList(() => collectionList?.filter((item) => item.mark));
   }
   function onChange(index: number) {
@@ -43,26 +85,34 @@ export default function SESider(props: any) {
           }}></Button>
       </Affix>
       <Drawer
-        title="收藏夹"
+        title="工具栏"
         placement="right"
         onClose={onClose}
         visible={drawerVisible}>
         <Space direction="vertical" style={{ display: "flex" }}>
-          <List bordered size="small" header="$ 收藏夹名称 $">
-            {collectionList?.map((item, index) => (
-              <List.Item key={index}>
-                <Text ellipsis>
-                  <a href={item.url}>{item.title}</a>
-                </Text>
-                <Rate
-                  count={1}
-                  defaultValue={1}
-                  value={item.mark ? 1 : 0}
-                  onChange={() => onChange(index)}
-                />
-              </List.Item>
-            ))}
-          </List>
+          <UserProfile
+            onlineState={onlineState}
+            setOnlineState={setOnlineState}
+          />
+          {onlineState ? (
+            <List bordered size="small" header="收藏夹">
+              {collectionList?.map((item, index) => (
+                <List.Item key={index}>
+                  <Text ellipsis>
+                    <a href={item.url}>{item.title}</a>
+                  </Text>
+                  <Rate
+                    count={1}
+                    defaultValue={1}
+                    value={item.mark ? 1 : 0}
+                    onChange={() => onChange(index)}
+                  />
+                </List.Item>
+              ))}
+            </List>
+          ) : (
+            <Empty description="暂无收藏" />
+          )}
         </Space>
       </Drawer>
     </>

@@ -22,6 +22,10 @@ export type CollectionItem = {
   title: string;
   mark?: boolean;
 };
+
+// 每页的最大结果数量
+const MAX_ITEM_NUMBER = 10;
+
 export default function TextResult(props: any) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
@@ -29,8 +33,6 @@ export default function TextResult(props: any) {
   const [relatedList, setRelatedList] = useState<string[]>([]);
   const [filterList, setFilterList] =
     useSessionStorageState<string[]>("nmse-filter-list");
-  const [uid, setUid] = useState(1);
-  const [collectionList, setCollectionList] = useState<CollectionItem[]>();
   const [searchParams] = useSearchParams();
   const { keyWord, setKeyWord } = props;
   const [loading, setLoading] = useState(true);
@@ -59,21 +61,23 @@ export default function TextResult(props: any) {
   }
 
   useEffect(() => {
-    searchResult(searchParams.get("word") || "", 1);
-  }, [searchParams]);
+    searchResult(getCombineContent(searchParams.get("word") || ""), 1);
+  }, [searchParams, filterList]);
+  // TODO: 删除挂钩地址栏搜索参数的搜索行为
 
   useEffect(() => {
-    // 过滤词
+    searchRelated(keyWord);
+    // TODO: 相关搜索先请求
+  }, []);
+
+  function getCombineContent(keyword: string) {
     let content = keyWord;
     if (filterList !== undefined) {
       content += filterList?.map((item) => "-" + item).join("");
     }
-    // 请求搜索结果
-    // searchResult(content, 1);
-    searchRelated(keyWord);
-    // TODO: 相关搜索先请求
-    // 请求相关搜索
-  }, []);
+    return content;
+  }
+
   async function searchRelated(content: string) {
     getRelatedAPI(keyWord).then((res) => {
       if (res.data.data != null) setRelatedList(res.data.data);
@@ -127,14 +131,11 @@ export default function TextResult(props: any) {
           onChange={handleFilterChange}
         />
         <Space direction="vertical" size="small" className="align-content">
-          {resultList?.slice(0, page * 10)?.map((item, index) => (
+          {resultList?.slice(0, page * MAX_ITEM_NUMBER)?.map((item, index) => (
             <ResultItem
               item={item}
               key={index}
               index={index}
-              uid={uid}
-              collectionList={collectionList}
-              setCollectionList={setCollectionList}
               keyWord={keyWord}
             />
           ))}
@@ -151,7 +152,7 @@ export default function TextResult(props: any) {
         <Pagination
           current={page}
           hideOnSinglePage
-          pageSize={10}
+          pageSize={MAX_ITEM_NUMBER}
           className="pagination align-content"
           defaultCurrent={1}
           total={total}

@@ -1,6 +1,11 @@
 import { Card, Col, Rate, Row, Space, Typography } from "antd";
+import { useEffect } from "react";
 import { postCollectionAPI } from "../../api/postCollection";
-import { CollectionItem, ResultItemType } from "../../pages/SearchResult";
+import {
+  CollectionItem,
+  LoginInfo,
+  ResultItemType
+} from "../../pages/SearchResult";
 import RichText from "../RichText";
 import "./index.css";
 
@@ -20,13 +25,14 @@ function RETitle(props: any) {
 }
 
 function REURL(props: any) {
-  const { item, setCollectionList, uid } = props;
-  const collectionList: CollectionItem[] = props.collectionList;
+  const { collectionList, setCollectionList } = LoginInfo.useContainer();
+  const { item } = props;
   const { id, url, title } = item;
   const pattern: RegExp = /^(http:\/\/|https:\/\/)[^/]+\//;
   const baseURL = pattern
     .exec(url)![0]
     .slice(0, pattern.exec(url)![0].length - 1);
+  const { onlineState } = LoginInfo.useContainer();
   let s: string = "";
   url
     .split(baseURL + "/")[1]
@@ -35,15 +41,20 @@ function REURL(props: any) {
       s += " > " + item;
     });
   function onChange(value: number) {
+    // 添加收藏
     if (value === 1) {
-      postCollectionAPI({ id, url, title, uid });
-      setCollectionList((state: CollectionItem[]) => {
+      console.log("hello");
+      postCollectionAPI({ id, url, title });
+      setCollectionList((state: any) => {
         return [...state, { id, url, title, mark: true }];
       });
-    } else
+    }
+    // 取消收藏
+    else {
       setCollectionList(() =>
-        collectionList.filter((Item, Index) => item.id !== Item.id)
+        collectionList?.filter((Item, Index) => id !== Item.id)
       );
+    }
   }
   return (
     <Row align="bottom">
@@ -55,36 +66,33 @@ function REURL(props: any) {
           </a>
         </Text>
       </Col>
-      <Col span={1}>
-        <Rate
-          count={1}
-          value={
-            collectionList?.filter(
-              (Item, Index) => Item.id === item.id && Item.mark
-            ).length
-              ? 1
-              : 0
-          }
-          onChange={onChange}
-        />
-      </Col>
+      {onlineState ? (
+        <Col span={1}>
+          <Rate
+            count={1}
+            value={
+              collectionList?.filter((Item, Index) => {
+                console.log("fuck");
+                return Item.id === item.id && Item.mark;
+              }).length
+                ? 1
+                : 0
+            }
+            onChange={onChange}
+          />
+        </Col>
+      ) : null}
     </Row>
   );
 }
 
 export default function ResultItem(props: any) {
-  const { index, collectionList, setCollectionList, uid, keyWord } = props;
+  const { index, keyWord, mark } = props;
   const item: ResultItemType = props.item;
   return (
     <Card bordered={false} size="small" key={item.id} style={{ maxWidth: 600 }}>
       <Space direction="vertical" className="result-wrapper">
-        <REURL
-          item={item}
-          index={index}
-          collectionList={collectionList}
-          setCollectionList={setCollectionList}
-          uid={uid}
-        />
+        <REURL item={item} index={index} mark={mark} />
         <RETitle title={item.title} url={item.url} keyWord={keyWord} />
         <Paragraph ellipsis={{ rows: 2 }}>
           <RichText plainText={item.content} keyWord={keyWord} />

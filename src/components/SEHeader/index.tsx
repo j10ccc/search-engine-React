@@ -23,7 +23,8 @@ export default function SEHeader(props: any) {
   }
   function onSearch() {
     setKeyWord(tmp);
-    navigate(`/search${searchMode === "text" ? "" : "/image"}?word=${tmp}`);
+    navigate(`/search${searchMode === "text" ? "" : "/image"}?word=${tmp}`, {});
+    navigate(0);
     if (keyWord !== tmp) postHistoryAPI({ preWord: keyWord, word: tmp });
   }
 

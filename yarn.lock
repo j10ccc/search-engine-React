@@ -24,7 +24,7 @@
 
 "@ant-design/icons@^4.7.0":
   version "4.7.0"
-  resolved "https://registry.npmjs.org/@ant-design/icons/-/icons-4.7.0.tgz"
+  resolved "https://registry.yarnpkg.com/@ant-design/icons/-/icons-4.7.0.tgz#8c3cbe0a556ba92af5dc7d1e70c0b25b5179af0f"
   integrity sha512-aoB4Z7JA431rt6d4u+8xcNPPCrdufSRMUOpxa1ab6mz1JCQZOEVolj2WVs/tDFmN62zzK30mNelEsprLYsSF3g==
   dependencies:
     "@ant-design/colors" "^6.0.0"
@@ -2428,18 +2428,9 @@ rc-util@^5.0.1, rc-util@^5.0.6, rc-util@^5.12.0, rc-util@^5.14.0, rc-util@^5.15.
     react-is "^16.12.0"
     shallowequal "^1.1.0"
 
-rc-virtual-list@^3.2.0, rc-virtual-list@^3.4.2:
+rc-virtual-list@^3.2.0, rc-virtual-list@^3.4.2, rc-virtual-list@^3.4.8:
   version "3.4.8"
   resolved "https://registry.npmjs.org/rc-virtual-list/-/rc-virtual-list-3.4.8.tgz"
-  integrity sha512-qSN+Rv4i/E7RCTvTMr1uZo7f3crJJg/5DekoCagydo9zsXrxj07zsFSxqizqW+ldGA16lwa8So/bIbV9Ofjddg==
-  dependencies:
-    classnames "^2.2.6"
-    rc-resize-observer "^1.0.0"
-    rc-util "^5.15.0"
-
-rc-virtual-list@^3.4.8:
-  version "3.4.8"
-  resolved "https://registry.yarnpkg.com/rc-virtual-list/-/rc-virtual-list-3.4.8.tgz#c24c10c6940546b7e2a5e9809402c6716adfd26c"
   integrity sha512-qSN+Rv4i/E7RCTvTMr1uZo7f3crJJg/5DekoCagydo9zsXrxj07zsFSxqizqW+ldGA16lwa8So/bIbV9Ofjddg==
   dependencies:
     classnames "^2.2.6"
@@ -2773,6 +2764,11 @@ unbox-primitive@^1.0.2:
     has-bigints "^1.0.2"
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
+
+unstated-next@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/unstated-next/-/unstated-next-1.1.0.tgz#7bb4911a12fdf3cc8ad3eb11a0b315e4a8685ea8"
+  integrity sha512-AAn47ZncPvgBGOvMcn8tSRxsrqwf2VdAPxLASTuLJvZt4rhKfDvUkmYZLGfclImSfTVMv7tF4ynaVxin0JjDCA==
 
 uri-js@^4.2.2:
   version "4.4.1"

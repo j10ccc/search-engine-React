@@ -2,7 +2,6 @@ import { Typography } from "antd";
 const { Text } = Typography;
 
 export default function RichText(props: any) {
-  // TODO:
   const { plainText, keyWord } = props;
   const tmp = plainText.split(keyWord);
 
