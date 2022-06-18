@@ -69,7 +69,7 @@ export default function UserProfile(props: any) {
   }
 
   function register(val: any) {
-    registerAPI({ username: val.userName, pwd: val.pwd }).then((res) => {
+    registerAPI({ username: val.username, pwd: val.pwd }).then((res) => {
       if (res.data.msg === "SUCCESS") {
         message.success("注册成功，已自动登录");
         setUserName(val.username);
