@@ -125,7 +125,7 @@ export default function TextResult(props: any) {
     return (
       <Content className="result-content" style={{ backgroundColor: "white" }}>
         <Space direction="vertical" size="small">
-          <div className="align-content result-info">共找到 {total} 条结果</div>
+          {/* <div className="align-content result-info">共找到 {total} 条结果</div> */}
           <Select
             open={false}
             className="align-content fit-width filter"
